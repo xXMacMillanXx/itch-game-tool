@@ -43,6 +43,76 @@ python main.py add -u https://itch.io/game_url -g "game_name" -v "game_version" 
 If you added a game this way, use add again if you update the game files, though it's probably not 
 necessary for ItchIO to function with the updated files.
 
+## Example Use
+
+### Add a game (which the ItchIO client doesn't install, because the files are handled externally)
+
+1. Download the game from itch or the itch provided download link (external website)
+2. Unzip the downloaded file (usually an archive like .zip)
+3. Copy the folder into your ItchIO game library:
+  - If your ItchIO game library is `path/to/ItchIOGames` copy it into a new folder in ItchIOGames
+  - The new folder should be the name of the game in lower case, like this: `Tic-Tac-Toe-0.3.5-pc.zip` -> `tic-tac-toe`
+  - Inside your new folder (here: `tic-tac-toe`) the naming isn't that important, but I would call it `TicTacToe-0.3.5-pc` in this case
+  - **Important** Be sure that the game files (like the .exe, .py or .sh) are inside the `TicTacToe-0.3.5-pc` folder:
+
+```txt
+path/to/ItchIOGames
+ |- tic-tac-toe
+     |- TicTacToe-0.3.5-pc
+         |- game/
+         |- data/
+         |- ttt.exe
+         |- ttt.py
+         |- ttt.sh
+```
+
+With the game data prepared, call the script:
+
+```bash
+# If you are on Linux with the ItchIO client flatpak
+python3 main.py add -u https://user.itch.io/game -g tic-tac-toe -v TicTacToe-0.3.5-pc
+
+# In any other case (Windows, Mac or Linux without the flatpak) you want to add the path to the ItchIO database manually
+# This should be the location for Linux with the non-flatpak client, for Mac and Windows you need to google or search for it 
+python3 main.py add -u https://user.itch.io/game -g tic-tac-toe -v TicTacToe-0.3.5-pc -d /home/<username>/.config/itch/db/butler.db
+```
+
+Everything should be handled automatically unless the script can't find information via the ItchIO API or the local DB, in which case
+the user has to provide the information.
+
+### Update a game (which the ItchIO client can't update, because the files are suddenly handled externally)
+
+1. Download the game from itch or the itch provided download link (external website)
+2. Unzip the downloaded file (usually an archive like .zip)
+3. Copy the game files into your ItchIO game library game (version) folder:
+  - If your ItchIO game is located at `path/to/ItchIOGames/game-name` copy the game files into its folder inside `game-name/game-name-0.0.0-pc`
+  - This should overwrite all the game files, essentially updating the game.
+  - **Important** Be sure that the game files (like the .exe, .py or .sh) are inside the folder, inside the game folder:
+
+```txt
+path/to/ItchIOGames
+ |- game-name
+     |- game-name-0.0.0-pc
+         |- game/
+         |- data/
+         |- game.exe
+         |- game.py
+         |- game.sh
+```
+
+With the game data prepared, call the script:
+
+```bash
+# If you are on Linux with the ItchIO client flatpak
+python3 main.py update https://user.itch.io/game
+
+# In any other case (Windows, Mac or Linux without the flatpak) you want to add the path to the ItchIO database manually
+# This should be the location for Linux with the non-flatpak client, for Mac and Windows you need to google or search for it 
+python3 main.py update https://user.itch.io/game /home/<username>/.config/itch/db/butler.db
+```
+
+Everything should be handled automatically unless the script can't find information via the ItchIO API.
+
 ## What the script doesn't do
 
 It doesn't download, unpack, copy game files for you.
@@ -68,5 +138,7 @@ G:\ItchIO\tic-tac-toe\ttt-v0.6\ttt.py
 
 ## Features for the future?
 
- - Cleaning up the code (it's a bit messy, but does the job, some dataclasses could be more aligned with the ItchIO interfaces)
- - 
+ - Cleaning up the code, it's a bit of a mess (but does the job)
+   - some dataclasses could be more aligned with the ItchIO interfaces
+   - some code segments could be functions, maybe even reused
+ - **maybe** a command which handles the unzip and copying of files, but only maybe

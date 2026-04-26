@@ -355,6 +355,14 @@ class Database:
         """
         self.__db_call__(query)
 
+    def add_or_update_game_uploads(self, game_upload: GameUploads) -> None:
+        query = f"""INSERT INTO game_uploads
+        VALUES({game_upload.game_id}, {game_upload.upload_id}, {game_upload.position})
+        ON CONFLICT(game_id, upload_id) DO UPDATE SET
+        position = excluded.position;
+        """
+        self.__db_call__(query)
+
 
 @dataclass
 class ApiBuild:

@@ -235,6 +235,12 @@ def add_game(
     if cave_id:
         cave.id = cave_id
     db.add_or_update_cave(cave)
+    if upload_is_manual:
+        g_u = itch.GameUploads(int(game_id), upload.id)
+        g_us = db.get_game_uploads(game_id)
+        if g_us:
+            g_u.position = len(g_us)
+        db.add_or_update_game_uploads(g_u)
 
     print("Registered Game:")
     print(f"  Game title: {upload.display_name}")
