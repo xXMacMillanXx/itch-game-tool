@@ -52,6 +52,20 @@ It doesn't download, unpack, copy game files for you.
 It collects needed information via the ItchIO API or the input of the user and sets
 the values in the local database so the games are updated or added to the ItchIO client.
 
+## Assumptions
+
+The script assumes the following structure for a game:
+
+```
+/path/to/itch_library/game_folder/game_version_folder/game_files
+
+game_files contains all neccesary game data. (game.py, game.sh, game.exe, ... )
+
+As an example:
+/mnt/Games/ItchIO/tic-tac-toe/ttt-v0.6/ttt.py
+G:\ItchIO\tic-tac-toe\ttt-v0.6\ttt.py
+```
+
 ## Features for the future?
 
  - Cleaning up the code (it's a bit messy, but does the job, some dataclasses could be more aligned with the ItchIO interfaces)

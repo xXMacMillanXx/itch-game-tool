@@ -6,11 +6,13 @@ import modules.itch as itch
 import modules.utility as utility
 
 
-def upload_selector(uploads: list[itch.ApiUpload]) -> itch.ApiUpload | None:
+def upload_selector(
+    uploads: list[itch.ApiUpload], add_skip: bool = False
+) -> itch.ApiUpload | None:
     if len(uploads) < 1:
         return None
 
-    if len(uploads) == 1:
+    if len(uploads) == 1 and not add_skip:
         return uploads[0]
 
     choice = -1
@@ -19,8 +21,10 @@ def upload_selector(uploads: list[itch.ApiUpload]) -> itch.ApiUpload | None:
         print(" ------------------------------------------------------------- ")
         for upload in uploads:
             print(
-                f" {upload.position}) {upload.display_name} - updated: {upload.updated_at}"
+                f" {upload.position}) {upload.display_name if upload.display_name else upload.filename} - updated: {upload.updated_at}"
             )
+        if add_skip:
+            print(" 9999) Enter information manually...")
         try:
             choice = int(input("Enter number: "))
         except ValueError:
@@ -28,6 +32,8 @@ def upload_selector(uploads: list[itch.ApiUpload]) -> itch.ApiUpload | None:
         for upload in uploads:
             if upload.position == choice:
                 return upload
+        if add_skip and choice == 9999:
+            return None
         print(" ------------------------------------------------------------- ")
         choice = -1
 
@@ -43,7 +49,7 @@ def manual_upload_data(
     ret.host = input("External download site url: ")
     ret.display_name = input("Name of the game: ")
     ret.game_id = game_id
-    ret.build_id = -1
+    ret.build_id = 0
     ret.storage = "external"
     ret.demo = True if input("Is the game a demo? (leave empty if no): ") else False
     ret.created_at = utc_now
@@ -174,10 +180,24 @@ def add_game(
     game_path = f"{library_path}/{game_folder}"
     game_version_path = f"{game_path}/{version_folder}"
 
-    uploads = api.fetch_uploads(game_id)
+    uploads = api.fetch_uploads(game_id)  # check web
     upload = upload_selector(uploads)
     upload_is_manual = False
-    if not upload:
+    if not upload:  # check local
+        local_upload_links = db.get_game_uploads(game_id)
+        if local_upload_links:
+            local_uploads: list[itch.ApiUpload] = []
+            for game_upload in local_upload_links:
+                local_upload = db.get_upload(game_upload.upload_id)
+                if not local_upload:
+                    continue
+                local_uploads.append(
+                    itch.convert_upload_to_apiupload(
+                        local_upload, int(game_id), game_upload.position
+                    )
+                )
+            upload = upload_selector(local_uploads, True)
+    if not upload:  # fallback to user
         print("Warning: No upload information received, enter manually.")
         upload_id = db.get_next_low_upload_id()
         upload = manual_upload_data(upload_id, int(game_id), game_version_path)

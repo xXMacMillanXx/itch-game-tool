@@ -119,6 +119,13 @@ class Build:
     updated_at: str = ""
 
 
+@dataclass
+class GameUploads:
+    game_id: int = 0
+    upload_id: int = 0
+    position: int = 0
+
+
 class Database:
     def __init__(self, db_path: str) -> None:
         self.db_path = db_path
@@ -176,6 +183,17 @@ class Database:
 
         return Cave(*res[0])
 
+    def get_upload(self, id: int | str) -> Upload | None:
+        query = f"""SELECT *
+        FROM uploads
+        WHERE id = {id};"""
+
+        res = self.__db_call__(query)
+        if not res:
+            return None
+
+        return Upload(*res[0])
+
     def get_install_location(self, install_location_id: str) -> str | None:
         query = f"""SELECT *
         FROM install_locations
@@ -212,6 +230,22 @@ class Database:
 
         inst_loc = InstallLocation(*res[0])
         return inst_loc.id
+
+    def get_game_uploads(self, game_id: int | str) -> list[GameUploads] | None:
+        query = f"""SELECT *
+        FROM game_uploads
+        WHERE game_id = {game_id};
+        """
+
+        res = self.__db_call__(query)
+        if not res:
+            return None
+
+        game_ups: list[GameUploads] = []
+        for game_up in res:
+            game_ups.append(GameUploads(*game_up))
+
+        return game_ups
 
     def get_next_low_upload_id(self) -> int:
         query = """SELECT id
@@ -603,6 +637,33 @@ def convert_apiupload_to_upload(upload: ApiUpload) -> Upload:
         "all" if upload.p_osx else "",
         upload.created_at,
         upload.updated_at,
+    )
+
+
+def convert_upload_to_apiupload(
+    upload: Upload, game_id: int, position: int
+) -> ApiUpload:
+    return ApiUpload(
+        True if upload.windows else False,
+        True if upload.osx else False,
+        True if upload.linux else False,
+        upload.host,
+        upload.display_name,
+        game_id,
+        ApiBuild(),
+        upload.build_id,
+        upload.storage,
+        True if upload.demo else False,
+        upload.created_at,
+        upload.channel_name,
+        True if upload.preorder else False,
+        False,
+        upload.updated_at,
+        upload.type,
+        upload.size,
+        position,
+        upload.id,
+        upload.filename,
     )
 
 
