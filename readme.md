@@ -24,6 +24,8 @@ python3 main.py update https://itch.io/game_url "path/to/butler.db"
 # you need to add the path to your butler.db
 ```
 
+In case update doesn't work, try using add instead.
+
 Sometimes a game just can't be added, because you get the game files and they are not
 managed by ItchIO. In that case, download the file and unpack it in your ItchIO library,
 so you have this structure `<itch_io_library>/<game_name>/<game_version>/<actual_game_files>`.
