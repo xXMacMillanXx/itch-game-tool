@@ -1,6 +1,5 @@
 import argparse
 from os import mkdir
-from os.path import exists
 
 import modules.itch as itch
 import modules.utility as utility
@@ -137,7 +136,7 @@ def update_game(game_url: str, butler_db_path: str) -> str:
             receipt_dir = f"{inst_loc}/{cave.install_folder_name}/.itch"
             receipt_file = f"{receipt_dir}/receipt.json.gz"
             receipt_json = "{}"
-            if not exists(receipt_file):
+            if not utility.exists(receipt_file):
                 mkdir(receipt_dir)
             else:
                 receipt_json = utility.read_gz(receipt_file)
