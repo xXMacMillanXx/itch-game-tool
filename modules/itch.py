@@ -50,6 +50,8 @@ class Cave:
     installed_at: str = ""
     last_touched_at: str = ""
     seconds_run: int = 0
+    local_seconds_run: int = 0
+    local_last_run_at: str = ""
     snoozed_at: str = ""
     verdict: str = ""
     settings: str = ""
@@ -113,6 +115,9 @@ class Build:
     id: int = 0
     parent_build_id: int = 0
     state: str = ""
+    upload_id: int = 0
+    game_id: int = 0
+    user_id: int = 0
     version: int = 0
     user_version: str = ""
     created_at: str = ""
@@ -327,7 +332,8 @@ class Database:
 
     def add_or_update_build(self, build: Build) -> None:
         query = f"""INSERT INTO builds
-        VALUES ({build.id}, {build.parent_build_id}, '{build.state}', {build.version},
+        VALUES ({build.id}, {build.parent_build_id}, '{build.state}',
+        {build.upload_id}, {build.game_id}, {build.user_id}, {build.version},
         '{build.user_version}', '{build.created_at}', '{build.updated_at}')
         ON CONFLICT(id) DO UPDATE SET
         parent_build_id = excluded.parent_build_id,
@@ -343,7 +349,8 @@ class Database:
         query = f"""INSERT INTO caves
         VALUES('{cave.id}', {cave.game_id}, {cave.external_game_id}, {cave.upload_id},
         {cave.build_id}, {int(cave.morphing)}, {int(cave.pinned)}, '{cave.installed_at}',
-        '{cave.last_touched_at}', {cave.seconds_run}, '{cave.snoozed_at}', '{cave.verdict}',
+        '{cave.last_touched_at}', {cave.seconds_run}, {cave.local_seconds_run},
+        '{cave.local_last_run_at}', '{cave.snoozed_at}', '{cave.verdict}',
         '{cave.settings}', {cave.installed_size}, '{cave.install_location_id}',
         '{cave.install_folder_name}', '{cave.custom_install_folder}')
         ON CONFLICT(id) DO UPDATE SET
@@ -396,6 +403,7 @@ class ApiUpload:
     position: int = 0
     id: int = 0
     filename: str = ""
+    md5_hash: str = ""
 
 
 @dataclass
