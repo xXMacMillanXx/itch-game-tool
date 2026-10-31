@@ -1,5 +1,10 @@
 # Itch IO Game Tool
 
+**Important:** I just found out that the ItchIO client has a `... More` button, after clicking
+the `Install` button, which has an option `Link existing folder...`. So, instead of using my tool
+it's possible to just download a game, unpack it into the ItchIO games folder and link it. The
+client handles the rest, which is very handy.
+
 ## The Issue
 
 The ItchIO client manages your ItchIO games, and updates them,
